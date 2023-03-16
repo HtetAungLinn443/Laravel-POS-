@@ -1,6 +1,6 @@
 @extends('user.layouts.master')
 
-@section('title','Cart Page')
+@section('title', 'Cart Page')
 
 @section('content')
     <!-- Cart Start -->
@@ -20,35 +20,37 @@
                     </thead>
                     <tbody class="align-middle">
                         @foreach ($cartList as $c)
-                        <tr>
-                            <td class=" ps-5 ">
-                                <img src="{{ asset('storage/'.$c->pizza_image) }}" alt="" style="width: 50px;">
-                                <input type="hidden" id="productId" value="{{ $c->product_id }}">
-                                <input type="hidden" id="userId" value="{{ $c->user_id }}">
-                                <input type="hidden" id="orderId" value="{{ $c->id }}">
-                            </td>
-                            <td class=" align-middle">
-                                {{ $c->pizza_name }}
-                            </td>
-                            <td class="align-middle" id="price">{{ $c->pizza_price }} Kyats</td>
-                            <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-minus" >
-                                        <i class="fa fa-minus"></i>
-                                        </button>
+                            <tr>
+                                <td class=" ps-5 ">
+                                    <img src="{{ asset('storage/' . $c->pizza_image) }}" alt="" style="width: 50px;">
+                                    <input type="hidden" id="productId" value="{{ $c->product_id }}">
+                                    <input type="hidden" id="userId" value="{{ $c->user_id }}">
+                                    <input type="hidden" id="orderId" value="{{ $c->id }}">
+                                </td>
+                                <td class=" align-middle">
+                                    {{ $c->pizza_name }}
+                                </td>
+                                <td class="align-middle" id="price">{{ $c->pizza_price }} Kyats</td>
+                                <td class="align-middle">
+                                    <div class="input-group quantity mx-auto" style="width: 100px;">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-sm btn-primary btn-minus">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm  border-0 text-center"
+                                            value="{{ $c->qty }}" id="qty">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-sm btn-primary btn-plus">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <input type="text" class="form-control form-control-sm  border-0 text-center" value="{{ $c->qty }}" id="qty">
-                                    <div class="input-group-btn">
-                                        <button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="align-middle col-2" id="total">{{ $c->qty*$c->pizza_price }} Kyats</td>
-                            <td class="align-middle"><button class="btn btn-sm btn-danger btnRemove"><i class="fa fa-times"></i></button></td>
-                        </tr>
+                                </td>
+                                <td class="align-middle col-2" id="total">{{ $c->qty * $c->pizza_price }} Kyats</td>
+                                <td class="align-middle"><button class="btn btn-sm btn-danger btnRemove"><i
+                                            class="fa fa-times"></i></button></td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -69,10 +71,12 @@
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Total</h5>
-                            <h5 id="finalPrice">{{ $totalPrice+3000 }} Kyats</h5>
+                            <h5 id="finalPrice">{{ $totalPrice + 3000 }} Kyats</h5>
                         </div>
-                        <button class="btn btn-block btn-primary font-weight-bold my-3 py-3" id="orderBtn">Proceed To Checkout</button>
-                        <button class="btn btn-block btn-danger font-weight-bold my-3 py-3" id="clearBtn">Clear Cart</button>
+                        <button class="btn btn-block btn-primary font-weight-bold my-3 py-3" id="orderBtn">Proceed To
+                            Checkout</button>
+                        <button class="btn btn-block btn-danger font-weight-bold my-3 py-3" id="clearBtn">Clear
+                            Cart</button>
                     </div>
                 </div>
             </div>
@@ -82,101 +86,104 @@
 @endsection
 
 @section('scriptSource')
-<script>
-    $(document).ready(function(){
-        // when + button click
-        $('.btn-plus').click(function(){
-            $partntNode = $(this).parents('tr');
-            $price = Number($partntNode.find('#price').html().replace("Kyats",""));
-            $qty = Number($partntNode.find('#qty').val());
-            $totalPrice = $price * $qty;
-            $partntNode.find('#total').html($totalPrice + ' Kyats');
+    <script>
+        $(document).ready(function() {
+            // when + button click
+            $('.btn-plus').click(function() {
+                $partntNode = $(this).parents('tr');
+                $price = Number($partntNode.find('#price').html().replace("Kyats", ""));
+                $qty = Number($partntNode.find('#qty').val());
+                $totalPrice = $price * $qty;
+                $partntNode.find('#total').html($totalPrice + ' Kyats');
 
-            summaryCalculation();
+                summaryCalculation();
 
-        })
-
-        // when - button click
-        $('.btn-minus').click(function(){
-            $partntNode = $(this).parents('tr');
-            $price = Number($partntNode.find('#price').html().replace("Kyats",""));
-            $qty = Number($partntNode.find('#qty').val());
-            $totalPrice = $price * $qty;
-            $partntNode.find('#total').html($totalPrice + ' Kyats');
-
-            summaryCalculation();
-
-        })
-
-        // when remove button click
-        $('.btnRemove').click(function(){
-            $partntNode = $(this).parents('tr');
-            $productId = $partntNode.find('#productId').val();
-            $orderId = $partntNode.find('#orderId').val();
-
-            $.ajax({
-                type : 'get',
-                url : 'http://127.0.0.1:8000/user/ajax/clear/current/product',
-                data : {'productId' : $productId, 'orderId' : $orderId},
-                dataType : 'json',
             })
 
-            $partntNode.remove();
-            summaryCalculation();
-        })
+            // when - button click
+            $('.btn-minus').click(function() {
+                $partntNode = $(this).parents('tr');
+                $price = Number($partntNode.find('#price').html().replace("Kyats", ""));
+                $qty = Number($partntNode.find('#qty').val());
+                $totalPrice = $price * $qty;
+                $partntNode.find('#total').html($totalPrice + ' Kyats');
 
-        function summaryCalculation(){
-            $total = 0;
-            $('#dataTable tbody tr').each(function(index,row){
-                $total += Number($(row).find('#total').text().replace("Kyats",""));
-            });
-            $("#subTotalPrice").html(`${$total} Kyats`);
-            $("#finalPrice").html(`${$total + 3000} Kyats`);
-        }
+                summaryCalculation();
 
-        // when Order button click
-        $('#orderBtn').click(function(){
-            $userId = $('#userId').val();
-            $orderList = [];
+            })
 
-            $random = Math.floor(Math.random() * 1000000001);
-            $('#dataTable tbody tr').each(function(index,row){
-                $orderList.push({
-                    'user_id' : $(row).find('#userId').val(),
-                    'product_id' : $(row).find('#productId').val(),
-                    'qty' : $(row).find('#qty').val(),
-                    'total' : $(row).find('#total').text().replace('Kyats','')*1,
-                    'order_code' : 'POS' + $random
+            // when remove button click
+            $('.btnRemove').click(function() {
+                $partntNode = $(this).parents('tr');
+                $productId = $partntNode.find('#productId').val();
+                $orderId = $partntNode.find('#orderId').val();
+
+                $.ajax({
+                    type: 'get',
+                    url: '/user/ajax/clear/current/product',
+                    data: {
+                        'productId': $productId,
+                        'orderId': $orderId
+                    },
+                    dataType: 'json',
                 })
 
+                $partntNode.remove();
+                summaryCalculation();
             })
 
-            $.ajax({
-                type : 'get',
-                url : 'http://127.0.0.1:8000/user/ajax/order',
-                data : Object.assign({},$orderList),
-                dataType : 'json',
-                success : function(response){
-                    if(response.status == "true"){
-                        window.location.href = 'http://127.0.0.1:8000/user/homePage';
+            function summaryCalculation() {
+                $total = 0;
+                $('#dataTable tbody tr').each(function(index, row) {
+                    $total += Number($(row).find('#total').text().replace("Kyats", ""));
+                });
+                $("#subTotalPrice").html(`${$total} Kyats`);
+                $("#finalPrice").html(`${$total + 3000} Kyats`);
+            }
+
+            // when Order button click
+            $('#orderBtn').click(function() {
+                $userId = $('#userId').val();
+                $orderList = [];
+
+                $random = Math.floor(Math.random() * 1000000001);
+                $('#dataTable tbody tr').each(function(index, row) {
+                    $orderList.push({
+                        'user_id': $(row).find('#userId').val(),
+                        'product_id': $(row).find('#productId').val(),
+                        'qty': $(row).find('#qty').val(),
+                        'total': $(row).find('#total').text().replace('Kyats', '') * 1,
+                        'order_code': 'POS' + $random
+                    })
+
+                })
+
+                $.ajax({
+                    type: 'get',
+                    url: 'http://127.0.0.1:8000/user/ajax/order',
+                    data: Object.assign({}, $orderList),
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status == "true") {
+                            window.location.href = 'http://127.0.0.1:8000/user/homePage';
+                        }
                     }
-                }
+                })
             })
-        })
 
-        // When clear button click
-        $('#clearBtn').click(function(){
-            $('#dataTable tbody tr').remove();
-            $('#subTotalPrice').html('0 Kyats');
-            $('#finalPrice').html('3000 Kyats');
+            // When clear button click
+            $('#clearBtn').click(function() {
+                $('#dataTable tbody tr').remove();
+                $('#subTotalPrice').html('0 Kyats');
+                $('#finalPrice').html('3000 Kyats');
 
-            $.ajax({
-                type : 'get',
-                url : 'http://127.0.0.1:8000/user/ajax/clear/cart',
-                dataType : 'json',
+                $.ajax({
+                    type: 'get',
+                    url: 'http://127.0.0.1:8000/user/ajax/clear/cart',
+                    dataType: 'json',
+                })
             })
-        })
 
-    })
-</script>
+        })
+    </script>
 @endsection

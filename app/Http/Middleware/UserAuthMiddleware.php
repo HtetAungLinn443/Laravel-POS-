@@ -17,10 +17,10 @@ class UserAuthMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if(Auth::user()->role == 'admin'){
+        if (Auth::user()->role == 'admin') {
 
             return back();
-        } else{
+        } else {
             return $next($request);
         }
 
